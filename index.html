@@ -105,6 +105,7 @@ li {
 
 const API = "http://localhost:5000";
 
+// Signup
 function signup(){
  fetch(API+"/signup",{
   method:"POST",
@@ -118,6 +119,7 @@ function signup(){
  alert("Signup done");
 }
 
+// Login
 function login(){
  fetch(API+"/login",{
   method:"POST",
@@ -130,6 +132,7 @@ function login(){
    .then(d=>alert("Login success"));
 }
 
+// Create Project
 function createProject(){
  fetch(API+"/project",{
   method:"POST",
@@ -141,6 +144,7 @@ function createProject(){
  alert("Project created");
 }
 
+// Create Task (FIXED)
 function createTask(){
  const title = document.getElementById("tTitle").value;
  const status = document.getElementById("status").value;
@@ -162,7 +166,7 @@ function createTask(){
  });
 }
 
-
+// Load Tasks (FIXED)
 function load(){
  fetch(API+"/tasks")
  .then(r=>r.json())
