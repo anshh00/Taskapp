@@ -6,14 +6,18 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect("mongodb+srv://ethara:etharaAI@ansh.w4qsvv5.mongodb.net/?appName=Ansh")
-.then(()=>console.log("DB Connected"))
-.catch(err=>console.log(err));
+const MONGO_URL = process.env.MONGO_URL || "mongodb+srv://ethara:etharaAI@ansh.w4qsvv5.mongodb.net/?appName=Ansh";
+
+mongoose.connect(MONGO_URL)
+.then(() => console.log("DB Connected"))
+.catch(err => console.log("DB Error:", err));
+
+
 
 const User = mongoose.model("User", {
   email: String,
   password: String,
-  role: String
+  role: String   // admin / member
 });
 
 const Project = mongoose.model("Project", {
@@ -23,37 +27,84 @@ const Project = mongoose.model("Project", {
 
 const Task = mongoose.model("Task", {
   title: String,
-  status: String,
+  status: {
+    type: String,
+    default: "Pending"
+  },
   projectId: String,
   assignedTo: String
 });
 
-
-app.post("/signup", async (req,res)=>{
-  const user = await User.create(req.body);
-  res.json(user);
+app.post("/signup", async (req, res) => {
+  try {
+    const user = await User.create(req.body);
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
+app.post("/login", async (req, res) => {
+  try {
+    const user = await User.findOne({
+      email: req.body.email,
+      password: req.body.password
+    });
 
-app.post("/login", async (req,res)=>{
-  const user = await User.findOne(req.body);
-  if(user) res.json(user);
-  else res.json({msg:"Invalid"});
+    if (user) res.json({ message: "Login successful", user });
+    else res.json({ message: "Invalid credentials" });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-app.post("/project", async (req,res)=>{
-  const p = await Project.create(req.body);
-  res.json(p);
+app.post("/project", async (req, res) => {
+  try {
+    const project = await Project.create({
+      name: req.body.name,
+      createdBy: req.body.createdBy || "unknown"
+    });
+
+    res.json(project);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-app.post("/task", async (req,res)=>{
-  const t = await Task.create(req.body);
-  res.json(t);
+app.post("/task", async (req, res) => {
+  try {
+    const { title, status, assignedTo, projectId } = req.body;
+
+    if (!title) {
+      return res.json({ message: "Title is required" });
+    }
+
+    const task = await Task.create({
+      title: title,
+      status: status || "Pending",   // ✅ default fix
+      assignedTo: assignedTo || "unassigned",
+      projectId: projectId || "default"
+    });
+
+    res.json(task);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-app.get("/tasks", async (req,res)=>{
-  const t = await Task.find();
-  res.json(t);
+app.get("/tasks", async (req, res) => {
+  try {
+    const tasks = await Task.find();
+    res.json(tasks);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-app.listen(5000, ()=>console.log("Server running"));
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

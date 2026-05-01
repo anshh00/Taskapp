@@ -2,6 +2,7 @@
 <html>
 <head>
 <title>Task Manager</title>
+
 <style>
 body {
   font-family: Arial;
@@ -58,6 +59,7 @@ li {
   border-radius: 5px;
 }
 </style>
+
 </head>
 
 <body>
@@ -68,8 +70,8 @@ li {
 <input id="sEmail" placeholder="Email">
 <input id="sPass" placeholder="Password">
 <select id="role">
-<option>admin</option>
-<option>member</option>
+<option value="admin">admin</option>
+<option value="member">member</option>
 </select>
 <button onclick="signup()">Signup</button>
 
@@ -84,10 +86,12 @@ li {
 
 <h2>Create Task</h2>
 <input id="tTitle" placeholder="Task Title">
+
 <select id="status">
-<option>Pending</option>
-<option>Done</option>
+  <option value="Pending">Pending</option>
+  <option value="Done">Done</option>
 </select>
+
 <input id="assign" placeholder="Assign to (email)">
 <button onclick="createTask()">Create Task</button>
 
@@ -98,6 +102,7 @@ li {
 </div>
 
 <script>
+
 const API = "http://localhost:5000";
 
 function signup(){
@@ -105,9 +110,9 @@ function signup(){
   method:"POST",
   headers:{"Content-Type":"application/json"},
   body: JSON.stringify({
-    email:sEmail.value,
-    password:sPass.value,
-    role:role.value
+    email: document.getElementById("sEmail").value,
+    password: document.getElementById("sPass").value,
+    role: document.getElementById("role").value
   })
  });
  alert("Signup done");
@@ -118,10 +123,11 @@ function login(){
   method:"POST",
   headers:{"Content-Type":"application/json"},
   body: JSON.stringify({
-    email:lEmail.value,
-    password:lPass.value
+    email: document.getElementById("lEmail").value,
+    password: document.getElementById("lPass").value
   })
- }).then(r=>r.json()).then(d=>alert("Login success"));
+ }).then(r=>r.json())
+   .then(d=>alert("Login success"));
 }
 
 function createProject(){
@@ -129,35 +135,53 @@ function createProject(){
   method:"POST",
   headers:{"Content-Type":"application/json"},
   body: JSON.stringify({
-    name:pName.value
+    name: document.getElementById("pName").value
   })
  });
  alert("Project created");
 }
 
 function createTask(){
+ const title = document.getElementById("tTitle").value;
+ const status = document.getElementById("status").value;
+ const assignedTo = document.getElementById("assign").value;
+
  fetch(API+"/task",{
   method:"POST",
   headers:{"Content-Type":"application/json"},
   body: JSON.stringify({
-    title:tTitle.value,
-    status:status.value,
-    assignedTo:assign.value
+    title: title,
+    status: status,
+    assignedTo: assignedTo
   })
+ })
+ .then(res => res.json())
+ .then(data => {
+   alert("Task created");
+   console.log(data);
  });
- alert("Task created");
 }
+
 
 function load(){
  fetch(API+"/tasks")
  .then(r=>r.json())
  .then(data=>{
+  const list = document.getElementById("list");
   list.innerHTML="";
+
   data.forEach(t=>{
-    list.innerHTML += `<li><b>${t.title}</b><br>Status: ${t.status}<br>Assigned: ${t.assignedTo}</li>`;
+    list.innerHTML += `
+      <li>
+        <b>${t.title}</b><br>
+        Status: ${t.status || "N/A"}<br>
+        Assigned: ${t.assignedTo || "N/A"}
+      </li>
+    `;
   });
  });
 }
+
 </script>
 
 </body>
