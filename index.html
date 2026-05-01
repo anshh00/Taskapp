@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Signup</h2>
+<input id="sEmail" placeholder="email">
+<input id="sPass" placeholder="password">
+<select id="role">
+<option>admin</option>
+<option>member</option>
+</select>
+<button onclick="signup()">Signup</button>
+
+<h2>Login</h2>
+<input id="lEmail" placeholder="email">
+<input id="lPass" placeholder="password">
+<button onclick="login()">Login</button>
+
+<h2>Create Project</h2>
+<input id="pName" placeholder="Project name">
+<button onclick="createProject()">Create</button>
+
+<h2>Create Task</h2>
+<input id="tTitle" placeholder="Task title">
+<select id="status">
+<option>Pending</option>
+<option>Done</option>
+</select>
+<input id="assign" placeholder="Assign to email">
+<button onclick="createTask()">Create</button>
+
+<h2>Dashboard</h2>
+<button onclick="load()">Load Tasks</button>
+<ul id="list"></ul>
+
+<script>
+const API = "http://localhost:5000";
+
+function signup(){
+ fetch(API+"/signup",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body: JSON.stringify({
+    email:sEmail.value,
+    password:sPass.value,
+    role:role.value
+  })
+ });
+}
+
+function login(){
+ fetch(API+"/login",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body: JSON.stringify({
+    email:lEmail.value,
+    password:lPass.value
+  })
+ }).then(r=>r.json()).then(d=>alert("Logged in"));
+}
+
+function createProject(){
+ fetch(API+"/project",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body: JSON.stringify({
+    name:pName.value
+  })
+ });
+}
+
+function createTask(){
+ fetch(API+"/task",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body: JSON.stringify({
+    title:tTitle.value,
+    status:status.value,
+    assignedTo:assign.value
+  })
+ });
+}
+
+function load(){
+ fetch(API+"/tasks")
+ .then(r=>r.json())
+ .then(data=>{
+  list.innerHTML="";
+  data.forEach(t=>{
+    list.innerHTML += `<li>${t.title} - ${t.status} - ${t.assignedTo}</li>`;
+  });
+ });
+}
+</script>
+
+</body>
+</html>
