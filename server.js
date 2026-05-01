@@ -5,8 +5,7 @@ const cors = require("cors");
 const app = express();
 app.use(cors());
 app.use(express.json());
-
-mongoose.connect("mongodb+srv://ethara:etharaAI@ansh.w4qsvv5.mongodb.net/?appName=Ansh")
+mongoose.connect(process.env.MONGO_URL)
 .then(()=>console.log("DB Connected"))
 .catch(err=>console.log(err));
 
@@ -57,4 +56,4 @@ app.get("/tasks", async (req,res)=>{
   res.json(t);
 });
 
-app.listen(5000, ()=>console.log("Server running"));
+app.listen(process.env.PORT || 5000, ()=>console.log("Server running"));
