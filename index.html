@@ -1,10 +1,72 @@
 <!DOCTYPE html>
 <html>
+<head>
+<title>Task Manager</title>
+<style>
+body {
+  font-family: Arial;
+  background: #f4f6f9;
+  margin: 0;
+  padding: 20px;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+h2 {
+  margin-top: 20px;
+}
+
+input, select {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #0056b3;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  background: #f1f1f1;
+  margin: 5px 0;
+  padding: 10px;
+  border-radius: 5px;
+}
+</style>
+</head>
+
 <body>
 
+<div class="container">
+
 <h2>Signup</h2>
-<input id="sEmail" placeholder="email">
-<input id="sPass" placeholder="password">
+<input id="sEmail" placeholder="Email">
+<input id="sPass" placeholder="Password">
 <select id="role">
 <option>admin</option>
 <option>member</option>
@@ -12,26 +74,28 @@
 <button onclick="signup()">Signup</button>
 
 <h2>Login</h2>
-<input id="lEmail" placeholder="email">
-<input id="lPass" placeholder="password">
+<input id="lEmail" placeholder="Email">
+<input id="lPass" placeholder="Password">
 <button onclick="login()">Login</button>
 
 <h2>Create Project</h2>
-<input id="pName" placeholder="Project name">
-<button onclick="createProject()">Create</button>
+<input id="pName" placeholder="Project Name">
+<button onclick="createProject()">Create Project</button>
 
 <h2>Create Task</h2>
-<input id="tTitle" placeholder="Task title">
+<input id="tTitle" placeholder="Task Title">
 <select id="status">
 <option>Pending</option>
 <option>Done</option>
 </select>
-<input id="assign" placeholder="Assign to email">
-<button onclick="createTask()">Create</button>
+<input id="assign" placeholder="Assign to (email)">
+<button onclick="createTask()">Create Task</button>
 
 <h2>Dashboard</h2>
 <button onclick="load()">Load Tasks</button>
 <ul id="list"></ul>
+
+</div>
 
 <script>
 const API = "http://localhost:5000";
@@ -46,6 +110,7 @@ function signup(){
     role:role.value
   })
  });
+ alert("Signup done");
 }
 
 function login(){
@@ -56,7 +121,7 @@ function login(){
     email:lEmail.value,
     password:lPass.value
   })
- }).then(r=>r.json()).then(d=>alert("Logged in"));
+ }).then(r=>r.json()).then(d=>alert("Login success"));
 }
 
 function createProject(){
@@ -67,6 +132,7 @@ function createProject(){
     name:pName.value
   })
  });
+ alert("Project created");
 }
 
 function createTask(){
@@ -79,6 +145,7 @@ function createTask(){
     assignedTo:assign.value
   })
  });
+ alert("Task created");
 }
 
 function load(){
@@ -87,7 +154,7 @@ function load(){
  .then(data=>{
   list.innerHTML="";
   data.forEach(t=>{
-    list.innerHTML += `<li>${t.title} - ${t.status} - ${t.assignedTo}</li>`;
+    list.innerHTML += `<li><b>${t.title}</b><br>Status: ${t.status}<br>Assigned: ${t.assignedTo}</li>`;
   });
  });
 }
